@@ -3,6 +3,7 @@ import sympy
 from sympy import simplify, tensorcontraction, tensorproduct
 from sympy.core.expr import Expr
 from sympy.core.function import AppliedUndef, UndefinedFunction
+from sympy.tensor.array import permutedims
 
 from einsteinpy.symbolic.helpers import simplify_sympy_array, sympy_to_np_array
 
@@ -53,12 +54,10 @@ def _change_config(tensor, metric, newconfig):
                     tensorcontraction(tensorproduct(met_dict[action], t), (1, 2 + i))
                 )
                 # reshuffle the indices
-                tmp = sympy_to_np_array(t)
-                source, dest = list(range(len(t.shape))), list(range(len(t.shape)))
+                dest = list(range(len(t.shape)))
                 dest.pop(i)
                 dest.insert(0, i)
-                tmp = np.moveaxis(tmp, source, dest)
-                t = sympy.Array(tmp)
+                permutedims(t, dest)
         return t
 
     return chain_config_change()
